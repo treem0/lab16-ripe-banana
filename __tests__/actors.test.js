@@ -67,7 +67,7 @@ describe('app routes', () => {
           name: 'Treemo Money',
           dob: '1991-08-30T00:00:00.000Z',
           pob: 'Pontiac, Michigan',
-          films: film.map(film => ({ _id: expect.any(String), title: film.title, released: film.released }))
+          films: film.map(film => ({ _id: film.id, title: film.title, released: film.released }))
         });
       });
   });
