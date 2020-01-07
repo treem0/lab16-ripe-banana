@@ -7,6 +7,8 @@ const mongoose = require('mongoose');
 const Studio = require('../lib/Model/Studio');
 const Actor = require('../lib/Model/Actor');
 const Film = require('../lib/Model/Film');
+const Review = require('../lib/Model/Review');
+const Reviewer = require('../lib/Model/Reviewer');
 
 describe('app routes', () => {
   beforeAll(() => {
@@ -19,6 +21,8 @@ describe('app routes', () => {
   let studio;
   let actor;
   let films;
+  let reviews;
+  let reviewer;
   beforeEach(async() => {
     studio = await  Studio.create({
       name: 'Treemos Pictures',
@@ -42,6 +46,19 @@ describe('app routes', () => {
         actor: actor._id
       }]
     }]);
+    reviewer = await Reviewer.create({
+      name: 'tmo',
+      company: 'treesus reviews'
+    });
+    reviews = await Review.create([{
+      rating: 5,
+      reviewer: reviewer._id,
+      review: 'this movie sucked',
+      film: {
+        _id: films[0]._id,
+        title: films[0].title
+      }
+    }]);
   });
 
   afterAll(() => {
@@ -64,20 +81,29 @@ describe('app routes', () => {
       });
   });
 
-  // it('has a get studio by id route', () => {
-  //   return request(app)
-  //     .get(`/api/v1/studios/${studio._id}`)
-  //     .then(res => {
-  //       expect(res.body).toEqual({
-  //         _id: studio._id.toString(),
-  //         name: 'Treemos Pictures',
-  //         address: {
-  //           city: 'Sherwood',
-  //           state: 'Oregon',
-  //           country: 'USA'
-  //         },
-  //         films: films.map(film => ({ _id: expect.any(String), title: film.title }))
-  //       });
-  //     });
-  // });
+  it('has a get films by id route', () => {
+    return request(app)
+      .get(`/api/v1/films/${films[0]._id}`)
+      .then(res => {
+        expect(res.body).toEqual({
+          _id: films[0]._id.toString(),
+          title: films[0].title,
+          released: films[0].released,
+          studio: {
+            _id: studio.id.toString(),
+            name: studio.name
+          },
+          cast: [{ _id: films[0].cast[0]._id.toString(), role: films[0].cast[0].role, actor: {
+            _id: actor._id.toString(),
+            name: 'treemo',
+            dob: '1991-08-30T00:00:00.000Z',
+            pob: 'Pontiac, Michigan'
+          } }],
+          reviews: reviews.map(review => ({ _id: review._id.toString(), rating: review.rating, review: review.review, reviewer: {
+            _id: reviewer.id,
+            name: reviewer.name
+          } }))
+        });
+      });
+  });
 });
