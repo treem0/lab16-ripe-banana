@@ -65,14 +65,13 @@ describe('app routes', () => {
       .then(res => {
         expect(res.body).toEqual({
           _id: studio._id.toString(),
-          __v: 0,
           name: 'Treemos Pictures',
           address: {
             city: 'Sherwood',
             state: 'Oregon',
             country: 'USA'
           },
-          films: films.map(film => ({ _id: expect.any(String), title: film.title, studio: studio.id.toString() }))
+          films: films.map(film => ({ _id: expect.any(String), title: film.title }))
         });
       });
   });
