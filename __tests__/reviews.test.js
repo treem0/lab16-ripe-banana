@@ -92,8 +92,6 @@ describe('app routes', () => {
     });
   });
 
-  console.log(film);
-
   afterAll(() => {
     return mongoose.connection.close();
   });
@@ -138,6 +136,20 @@ describe('app routes', () => {
             title: film.title
           }
         }]);
+      });
+  });
+
+  it('has a delete route', () => {
+    return request(app)
+      .delete(`/api/v1/reviews/${review.id}`)
+      .then(res => {
+        expect(res.body).toEqual({
+          _id: review.id, 
+          rating: 5,
+          reviewer: reviewer.id,
+          review: 'this movie sucked',
+          film: film.id,
+        });
       });
   });
 });
