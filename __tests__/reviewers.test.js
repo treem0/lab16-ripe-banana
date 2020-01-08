@@ -23,6 +23,7 @@ describe('app routes', () => {
   let films;
   let reviews;
   let reviewer;
+  let reviewer2;
   beforeEach(async() => {
     studio = await  Studio.create({
       name: 'Treemos Pictures',
@@ -50,6 +51,10 @@ describe('app routes', () => {
       name: 'tmo',
       company: 'treesus reviews'
     });
+    reviewer2 = await Reviewer.create({
+      name: 'tmo2',
+      company: 'treesus reviews2'
+    });
     reviews = await Review.create([{
       rating: 5,
       reviewer: reviewer._id,
@@ -74,6 +79,11 @@ describe('app routes', () => {
           name: 'tmo',
           company: 'treesus reviews',
           __v: 0
+        }, {
+          __v: 0,
+          _id: reviewer2.id,
+          company: 'treesus reviews2',
+          name: 'tmo2',
         }]);
       });
   });
@@ -95,6 +105,29 @@ describe('app routes', () => {
               title: films[0].title
             }
           }]
+        });
+      });
+  });
+
+  it('has a delete reviewers by id unless they have reviews', () => {
+    return request(app)
+      .delete(`/api/v1/reviewers/${reviewer.id}`)
+      .then(res => {
+        expect(res.body).toEqual({
+          message: 'Reviewer cannot be deleted while reviews still present',
+          status: 500
+        });
+      });
+  });
+  it('has a delete reviewers by id and deletes if they have no reviews', () => {
+    return request(app)
+      .delete(`/api/v1/reviewers/${reviewer2.id}`)
+      .then(res => {
+        expect(res.body).toEqual({
+          _id: reviewer2.id,
+          company: 'treesus reviews2',
+          name: 'tmo2',
+          __v: 0
         });
       });
   });
