@@ -91,7 +91,7 @@ describe('app routes', () => {
             rating: 5,
             review: 'this movie sucked',
             film: {
-              _id: films[0].id.toString(),
+              _id: films[0].id,
               title: films[0].title
             }
           }]
