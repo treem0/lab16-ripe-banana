@@ -26,7 +26,11 @@ describe('app routes', () => {
           name: actor.name,
           dob: actor.dob,
           pob: actor.pob,
-          films: films.map(film => ({ _id: film._id, released: film.released, title: film.title }))
+          films: films.map(film => ({
+            _id: film._id,
+            released: film.released,
+            title: film.title
+          }))
         });
       });
   });
