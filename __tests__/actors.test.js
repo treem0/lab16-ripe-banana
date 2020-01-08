@@ -1,73 +1,32 @@
-require('dotenv').config();
+const { getActor, getActors, getFilms } = require('../lib/helpers/data-helpers');
 
 const request = require('supertest');
 const app = require('../lib/app');
-const connect = require('../lib/utils/connect');
-const mongoose = require('mongoose');
-const Actor = require('../lib/Model/Actor');
-const Film = require('../lib/Model/Film');
-const Studio = require('../lib/Model/Studio');
+
 
 describe('app routes', () => {
-  beforeAll(() => {
-    connect();
-  });
+  it('has a get all actors route', async() => {
+    const actors = await getActors();
 
-  beforeEach(() => {
-    return mongoose.connection.dropDatabase();
-  });
-  let actor;
-  let film;
-  let studio;
-  beforeEach(async() => {
-    studio = await  Studio.create({
-      name: 'Treemos Pictures',
-      address: {
-        city: 'Sherwood',
-        state: 'Oregon',
-        country: 'USA'
-      }
-    });
-    actor = await  Actor.create({
-      name: 'Treemo Money',
-      dob: '1991-08-30',
-      pob: 'Pontiac, Michigan'
-    });
-    film = await Film.create([{
-      title: 'Treemo Ninja',
-      studio: studio._id,
-      released: 2020,
-      cast: [{
-        role: 'best actor',
-        actor: actor._id
-      }]
-    }]);
-  });
-
-  afterAll(() => {
-    return mongoose.connection.close();
-  });
-
-  it('has a get all actors route', () => {
     return request(app)
       .get('/api/v1/actors')
       .then(res => {
-        expect(res.body).toEqual([{
-          _id: actor.id,
-          name: 'Treemo Money'
-        }]);
+        expect(res.body).toEqual(actors.map(actor => ({ _id: actor._id, name: actor.name })));
       });
   });
 
-  it('has a get actor by id route', () => {
+  it('has a get actor by id route', async() => {
+    const actor = await getActor();
+    const films = await getFilms({ 'cast.actor': actor._id });
+
     return request(app)
-      .get(`/api/v1/actors/${actor.id}`)
+      .get(`/api/v1/actors/${actor._id}`)
       .then(res => {
         expect(res.body).toEqual({
-          name: 'Treemo Money',
-          dob: '1991-08-30T00:00:00.000Z',
-          pob: 'Pontiac, Michigan',
-          films: film.map(film => ({ _id: film.id, title: film.title, released: film.released }))
+          name: actor.name,
+          dob: actor.dob,
+          pob: actor.pob,
+          films: films.map(film => ({ _id: film._id, released: film.released, title: film.title }))
         });
       });
   });
