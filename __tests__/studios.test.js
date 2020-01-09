@@ -19,8 +19,7 @@ describe('app routes', () => {
 
   it('has a get studio by id route', async() => {
     const studio = await getStudio();
-    const films = await getFilms({ _id: studio.films
-    });
+    
     return request(app)
       .get(`/api/v1/studios/${studio._id}`)
       .then(res => {
